@@ -82,6 +82,18 @@ class Board:
                             (x, y), "white" if piece[0] == "w" else "black", self
                         )
 
+    def is_in_checkmate(self, color):
+        output = False
+        pieces_left = [
+            i.occupying_piece.color + i.occupying_piece.notation
+            for i in self.squares
+            if i.occupying_piece is not None
+        ]
+        return color + "K" not in pieces_left
+
+    def is_in_check(self, color):
+        return False
+
     def handle_click(self, mx, my):
         x = mx // self.tile_width
         y = my // self.tile_height
