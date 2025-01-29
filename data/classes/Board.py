@@ -102,8 +102,10 @@ class Board:
             if clicked_square.occupying_piece is not None:
                 if clicked_square.occupying_piece.color == self.turn:
                     self.selected_piece = clicked_square.occupying_piece
+        # successfully made a move
         elif self.selected_piece.move(self, clicked_square):
             self.turn = "white" if self.turn == "black" else "black"
+            print(self.get_board_state())
         elif clicked_square.occupying_piece is not None:
             if clicked_square.occupying_piece.color == self.turn:
                 self.selected_piece = clicked_square.occupying_piece
@@ -115,3 +117,16 @@ class Board:
                 square.highlight = True
         for square in self.squares:
             square.draw(display)
+
+    def get_board_state(self):
+        # 2d 6x6 array
+        output = [["" for _ in range(6)] for _ in range(6)]
+
+        for square in self.squares:
+            if square.occupying_piece is not None:
+                output[square.y][square.x] = (
+                    square.occupying_piece.color[0] + square.occupying_piece.notation
+                )
+            else:
+                output.append("")
+        return output
