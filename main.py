@@ -1,6 +1,7 @@
 import pygame
 
 from data.classes.Board import Board
+from data.classes.Bot import Bot
 
 pygame.init()
 
@@ -18,6 +19,8 @@ def draw(display):
 
 if __name__ == "__main__":
     running = True
+    bot1 = Bot("black", board)
+    bot2 = Bot("white", board)
     while running:
         mx, my = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -28,6 +31,12 @@ if __name__ == "__main__":
                 # If the mouse is clicked
                 if event.button == 1:
                     board.handle_click(mx, my)
+
+        if board.turn == "black":
+            bot1.move()
+        else:
+            bot2.move()
+
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")
             running = False
