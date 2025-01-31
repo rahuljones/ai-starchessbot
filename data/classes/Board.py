@@ -130,3 +130,21 @@ class Board:
             else:
                 output.append("")
         return output
+
+    def handle_move(self, start_pos, end_pos):
+        start_square = self.get_square_from_pos(start_pos)
+        end_square = self.get_square_from_pos(end_pos)
+
+        if start_square.occupying_piece is None:
+            return False
+
+        if start_square.occupying_piece.color != self.turn:
+            return False
+
+        if start_square.occupying_piece.move(self, end_square):
+            self.turn = "white" if self.turn == "black" else "black"
+            print(self.get_board_state())
+            return True
+
+    def alg_not_to_pos(self, alg_not):
+        return (ord(alg_not[0]) - 65, int(alg_not[1]) - 1)
