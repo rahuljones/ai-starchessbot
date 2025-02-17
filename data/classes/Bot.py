@@ -65,8 +65,12 @@ class Bot:
                     else:
                         evaluation -= piece_value
         return evaluation
-
-    def alpha_beta(self, board ,depth, alpha, beta, maximizing_player):
+    def simulate_move(self, start_pos, end_pos):
+        new_board = self.board.copy()  
+        new_board.handle_move(start_pos, end_pos)
+        return new_board
+    
+    def alpha_beta(self, board, depth, alpha, beta, maximizing_player):
         if depth == 0 or board.is_in_checkmate(self.side):
             return self.evaluate_board(board)
 
@@ -74,8 +78,8 @@ class Bot:
         if maximizing_player:
             max_eval = float('-inf')
             for init_pos, end_pos in moves:
-                board = self.simulate_move(init_pos, end_pos)
-                eval = self.alpha_beta(depth - 1, board, alpha, beta, False)
+                simulated_board = self.simulate_move(init_pos, end_pos)
+                eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, False)
                 max_eval = max(max_eval, eval)
                 alpha = max(alpha, eval)
                 if beta <= alpha:
@@ -84,18 +88,28 @@ class Bot:
         else:
             min_eval = float('inf')
             for init_pos, end_pos in moves:
-                board = self.simulate_move(init_pos, end_pos)
-                eval = self.alpha_beta(depth - 1, board, alpha, beta, True)
+                simulated_board = self.simulate_move(init_pos, end_pos)
+                eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, True)
                 min_eval = min(min_eval, eval)
                 beta = min(beta, eval)
                 if beta <= alpha:
                     break
-            return 
-        
-    def simulate_move(self, start_pos, end_pos):
-        new_board = self.board.copy()  
-        new_board.handle_move(start_pos, end_pos)
-        return new_board
+            return min_eval
+
+    def get_best_move_alpha_beta(self, depth):
+        best_move = None
+        best_eval = float('-inf')
+        alpha = float('-inf')
+        beta = float('inf')
+        moves = self.board.get_all_valid_moves(self.side)
+        for init_pos, end_pos in moves:
+            simulated_board = self.simulate_move(init_pos, end_pos)
+            eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, False)
+            if eval > best_eval:
+                best_eval = eval
+                best_move = (init_pos, end_pos)
+            alpha = max(alpha, eval)
+        return best_move
         
     def move(self):
         # pick a random move for now
