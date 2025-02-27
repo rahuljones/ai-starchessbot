@@ -70,7 +70,7 @@ class Bot:
         new_board.handle_move(start_pos, end_pos)
         return new_board
     
-    def alpha_beta(self, board, depth, alpha, beta, maximizing_player):
+    def minimax(self, board, depth, maximizing_player):
         if depth == 0 or board.is_in_checkmate(self.side):
             return self.evaluate_board(board)
 
@@ -79,37 +79,68 @@ class Bot:
             max_eval = float('-inf')
             for init_pos, end_pos in moves:
                 simulated_board = self.simulate_move(init_pos, end_pos)
-                eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, False)
+                eval = self.minimax(simulated_board, depth - 1, False)
                 max_eval = max(max_eval, eval)
-                alpha = max(alpha, eval)
-                if beta <= alpha:
-                    break
             return max_eval
         else:
             min_eval = float('inf')
             for init_pos, end_pos in moves:
                 simulated_board = self.simulate_move(init_pos, end_pos)
-                eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, True)
+                eval = self.minimax(simulated_board, depth - 1, True)
                 min_eval = min(min_eval, eval)
-                beta = min(beta, eval)
-                if beta <= alpha:
-                    break
             return min_eval
 
-    def get_best_move_alpha_beta(self, depth):
+    def get_best_move_minimax(self, depth):
         best_move = None
-        best_eval = float('-inf')
-        alpha = float('-inf')
-        beta = float('inf')
+        best_value = float('-inf')
         moves = self.board.get_all_valid_moves(self.side)
         for init_pos, end_pos in moves:
             simulated_board = self.simulate_move(init_pos, end_pos)
-            eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, False)
-            if eval > best_eval:
-                best_eval = eval
+            move_value = self.minimax(simulated_board, depth - 1, False)
+            if move_value > best_value:
+                best_value = move_value
                 best_move = (init_pos, end_pos)
-            alpha = max(alpha, eval)
         return best_move
+    # def alpha_beta(self, board, depth, alpha, beta, maximizing_player):
+    #     if depth == 0 or board.is_in_checkmate(self.side):
+    #         return self.evaluate_board(board)
+
+    #     moves = board.get_all_valid_moves(self.side)
+    #     if maximizing_player:
+    #         max_eval = float('-inf')
+    #         for init_pos, end_pos in moves:
+    #             simulated_board = self.simulate_move(init_pos, end_pos)
+    #             eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, False)
+    #             max_eval = max(max_eval, eval)
+    #             alpha = max(alpha, eval)
+    #             if beta <= alpha:
+    #                 break
+    #         return max_eval
+    #     else:
+    #         min_eval = float('inf')
+    #         for init_pos, end_pos in moves:
+    #             simulated_board = self.simulate_move(init_pos, end_pos)
+    #             eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, True)
+    #             min_eval = min(min_eval, eval)
+    #             beta = min(beta, eval)
+    #             if beta <= alpha:
+    #                 break
+    #         return min_eval
+
+    # def get_best_move_alpha_beta(self, depth):
+    #     best_move = None
+    #     best_eval = float('-inf')
+    #     alpha = float('-inf')
+    #     beta = float('inf')
+    #     moves = self.board.get_all_valid_moves(self.side)
+    #     for init_pos, end_pos in moves:
+    #         simulated_board = self.simulate_move(init_pos, end_pos)
+    #         eval = self.alpha_beta(simulated_board, depth - 1, alpha, beta, False)
+    #         if eval > best_eval:
+    #             best_eval = eval
+    #             best_move = (init_pos, end_pos)
+    #         alpha = max(alpha, eval)
+    #     return best_move
         
     def move(self):
         # pick a random move for now
