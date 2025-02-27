@@ -38,6 +38,10 @@ class Piece:
             prev_square = board.get_square_from_pos(self.pos)
             self.pos, self.x, self.y = square.pos, square.x, square.y
             prev_square.occupying_piece = None
+            if square.occupying_piece is not None:
+                board.last_captured = 0
+            else:
+                board.last_captured += 1
             square.occupying_piece = self
             board.selected_piece = None
             self.has_moved = True

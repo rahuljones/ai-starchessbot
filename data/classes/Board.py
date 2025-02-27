@@ -29,6 +29,7 @@ class Board:
             ["wR", "wN", "wQ", "wK", "wB", "wS"],
         ]
         self.squares = self.generate_squares()
+        self.last_captured = 0
         self.setup_board()
 
     def generate_squares(self):
@@ -159,3 +160,5 @@ class Board:
                 for move in square.occupying_piece.get_valid_moves(self):
                     output.append((square.pos, move.pos))
         return output
+    def is_in_draw(self):
+        return self.last_captured >= 100
