@@ -32,19 +32,23 @@ if __name__ == "__main__":
                 # If the mouse is clicked
                 if event.button == 1:
                     board.handle_click(mx, my)
+                    print(board.last_captured)
 
-        if board.turn == "black":
-            bot1.move()
-            time.sleep(1)
-        else:
-            bot2.move()
-            time.sleep(1)
+        # if board.turn == "black":
+        #     bot1.move()
+        #     time.sleep(1)
+        # else:
+        #     bot2.move()
+        #     time.sleep(1)
 
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")
             running = False
         elif board.is_in_checkmate("white"):  # If white is in checkmate
             print("Black wins!")
+            running = False
+        elif board.is_in_draw():
+            print("Draw!")
             running = False
         # Draw the board
         draw(screen)
