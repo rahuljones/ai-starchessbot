@@ -1,5 +1,5 @@
 # /* Pawn.py
-
+# Note that the pawn doubles as a piece for both the pawn and joker
 import pygame
 
 from data.classes.Piece import Piece
@@ -8,12 +8,22 @@ from data.classes.Piece import Piece
 class Pawn(Piece):
     def __init__(self, pos, color, board):
         super().__init__(pos, color, board)
+
+        self.promoted = False
         img_path = "data/imgs/" + color[0] + "_pawn.png"
         self.img = pygame.image.load(img_path)
         self.img = pygame.transform.scale(
             self.img, (board.tile_width - 35, board.tile_height - 35)
         )
         self.notation = " "
+    
+    def promote(self, color, board):
+        self.promoted = True
+        self.img = pygame.image.load("data/imgs/" + color[0] + "_joker.png")
+        self.img = pygame.transform.scale(
+            self.img, (board.tile_width - 35, board.tile_height - 35)
+        )
+        self.notation = "J"
 
     def get_possible_moves(self, board):
         output = []
@@ -35,6 +45,25 @@ class Pawn(Piece):
 
     def get_moves(self, board):
         output = []
+
+        if self.promoted == True:
+            #print("This is joker moveset")
+            output = []
+            moves = [(1, 1), (-1, 1), (1, -1), (-1, -1), (2, 0), (-2, 0), (0, 2), (0, -2), (1, 0), (-1, 0), (0, 1), (0, -1), (2, 2), (-2, 2), (2, -2), (-2, -2)]
+            for move in moves:
+                new_pos = (self.x + move[0], self.y + move[1])
+                if (
+                    new_pos[0] < 6
+                    and new_pos[0] >= 0
+                    and new_pos[1] < 6
+                    and new_pos[1] >= 0
+                ):
+                    square = board.get_square_from_pos(new_pos)
+                    if square.occupying_piece == None or square.occupying_piece.color != self.color:
+                        output.append(square)
+            return output
+
+
         for square in self.get_possible_moves(board):
             if square.occupying_piece != None:
                 break
@@ -65,6 +94,8 @@ class Pawn(Piece):
         return output
 
     def attacking_squares(self, board):
-        moves = self.get_moves(board)
+        if self.promoted == True:
+            return self.get_possible_moves(board)
         # return the diagonal moves
+        moves = self.get_moves(board)
         return [i for i in moves if i.x != self.x]
