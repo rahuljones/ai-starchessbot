@@ -8,7 +8,6 @@ from data.classes.Piece import Piece
 class Pawn(Piece):
     def __init__(self, pos, color, board):
         super().__init__(pos, color, board)
-
         self.promoted = False
         img_path = "data/imgs/" + color[0] + "_pawn.png"
         self.img = pygame.image.load(img_path)
@@ -16,7 +15,6 @@ class Pawn(Piece):
             self.img, (board.tile_width - 35, board.tile_height - 35)
         )
         self.notation = " "
-    
     def promote(self, color, board):
         self.promoted = True
         self.img = pygame.image.load("data/imgs/" + color[0] + "_joker.png")

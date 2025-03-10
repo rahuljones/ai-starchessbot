@@ -11,7 +11,9 @@ class Piece:
         self.color = color
         self.has_moved = False
         self.has_promoted = False
-
+        self.notation = None
+    def get_notation(self):
+        return self.notation
     def get_moves(self, board):
         output = []
         for direction in self.get_possible_moves(board):
@@ -38,8 +40,7 @@ class Piece:
         if square in self.get_valid_moves(board) or force:
             prev_square = board.get_square_from_pos(self.pos)
             self.pos, self.x, self.y = square.pos, square.x, square.y
-            print(self.__class__.__name__)
-            if(self.__class__.__name__ == "Pawn" and self.y == 0 and self.color == "white") or (self.__class__.__name__ == "Pawn" and self.y == 5 and self.color == "black") and not self.has_promoted:
+            if(self.get_notation() == ' ' and self.y == 0 and self.color == "white") or (self.get_notation() == ' ' and self.y == 5 and self.color == "black") and not self.has_promoted:
                 self.promote(self.color, board)
                 print("Pawn has been promoted")
 
