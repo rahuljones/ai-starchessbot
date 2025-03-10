@@ -45,14 +45,15 @@ _Pawns move as follows:_
 
 ### **Joker (Special Piece)**
 - This piece is only obtained if you manage to **promote** a pawn into it by reaching the opposite side of the board.
-- Moves: 
+- Moves: One square in any **diagonal**,  **horizontal** or **vertical** direction. Or jump two squares in any **diagonal**,  **horizontal** or **vertical** direction.
+- Can **jump** over other pieces.
 
 ## Additional Rules
 - **Board Setup:** The board is **6x6**, reducing the number of total pieces compared to standard chess.
-- **Promotion Rules:** What happens when a pawn reaches the last rank?
+- **Promotion Rules:** When a pawn reaches the last rank it promotes into the power Joker piece.
 
 ## Winning Conditions
-- **King Capture:** If a player’s King is in captures the game ends, with the last standing king winning the game.
-- **Draw conditions:** If the game does not end within a set number of moves the game will be considered a draw.
+- **King Capture:** If a player’s King is in captured the game ends, with the last standing king winning the game.
+- **Draw conditions:** If the game does not end within 100 moves the game will be considered a draw.
 
 ---
