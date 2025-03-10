@@ -19,7 +19,7 @@ class Pawn(Piece):
         self.promoted = True
         self.img = pygame.image.load("data/imgs/" + color[0] + "_joker.png")
         self.img = pygame.transform.scale(
-            self.img, (board.tile_width - 35, board.tile_height - 35)
+            self.img, (board.tile_width + 60, board.tile_height - 5)
         )
         self.notation = "J"
 
