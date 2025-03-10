@@ -51,8 +51,6 @@ if __name__ == "__main__":
         elif board.is_in_draw():
             print("Draw!")
             running = False
-
-        #board.promote_pawn()
             
         # Draw the board
         draw(screen)

@@ -84,21 +84,6 @@ class Board:
                         )
 
 
-    # def promote_pawn(self):
-    #     state = self.get_board_state()
-    #     #print(state[0])
-    #     #print(state[5])
-    #     #check for white pawn promotion
-    #     for piece in state[0]:
-    #         if piece == 'w ':
-    #             #print("Promote white pawn")
-
-    #     #check for black pawn promotion
-    #     for piece in state[5]:
-    #         if piece == 'b ':
-    #             #print("Promote black pawn")
-        
-
     def is_in_checkmate(self, color):
         output = False
         pieces_left = [

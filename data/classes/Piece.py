@@ -42,7 +42,7 @@ class Piece:
             self.pos, self.x, self.y = square.pos, square.x, square.y
             if(self.get_notation() == ' ' and self.y == 0 and self.color == "white") or (self.get_notation() == ' ' and self.y == 5 and self.color == "black") and not self.has_promoted:
                 self.promote(self.color, board)
-                print("Pawn has been promoted")
+                #print("Pawn has been promoted")
 
             prev_square.occupying_piece = None
             if square.occupying_piece is not None:
