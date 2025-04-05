@@ -38,6 +38,7 @@ if __name__ == "__main__":
         else:
             bot2.move()
 
+
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")
             running = False
@@ -47,5 +48,6 @@ if __name__ == "__main__":
         elif board.is_in_draw():
             print("Draw!")
             running = False
+            
         # Draw the board
         draw(screen)

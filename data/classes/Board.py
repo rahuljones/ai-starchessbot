@@ -79,6 +79,7 @@ class Board:
                             (x, y), "white" if piece[0] == "w" else "black", self
                         )
 
+
     def is_in_checkmate(self, color):
         output = False
         pieces_left = [
@@ -103,6 +104,7 @@ class Board:
         elif self.selected_piece.move(self, clicked_square):
             self.turn = "white" if self.turn == "black" else "black"
             print(self.get_board_state())
+
         elif clicked_square.occupying_piece is not None:
             if clicked_square.occupying_piece.color == self.turn:
                 self.selected_piece = clicked_square.occupying_piece
