@@ -1,8 +1,3 @@
-# /* Piece.py
-
-import pygame
-
-
 class Piece:
     def __init__(self, pos, color, board):
         self.pos = pos

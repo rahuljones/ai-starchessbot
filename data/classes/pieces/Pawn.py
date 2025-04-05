@@ -1,9 +1,6 @@
-# /* Pawn.py
-# Note that the pawn doubles as a piece for both the pawn and joker
 import pygame
 
 from data.classes.Piece import Piece
-
 
 class Pawn(Piece):
     def __init__(self, pos, color, board):

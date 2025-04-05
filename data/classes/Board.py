@@ -1,6 +1,3 @@
-# /* Board.py
-
-import pygame
 from data.classes.Square import Square
 from data.classes.pieces.Rook import Rook
 from data.classes.pieces.Bishop import Bishop
@@ -9,7 +6,6 @@ from data.classes.pieces.Queen import Queen
 from data.classes.pieces.King import King
 from data.classes.pieces.Pawn import Pawn
 from data.classes.pieces.Star import Star
-
 
 # Game state checker
 class Board:
