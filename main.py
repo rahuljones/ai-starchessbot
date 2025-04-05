@@ -1,8 +1,7 @@
 import pygame
-import time
 
 from data.classes.Board import Board
-from data.classes.Bot import Bot
+from data.classes.bots.random_bot import Bot
 
 pygame.init()
 
@@ -34,12 +33,10 @@ if __name__ == "__main__":
                     board.handle_click(mx, my)
                     print(board.last_captured)
 
-        # if board.turn == "black":
-        #     bot1.move()
-        #     time.sleep(1)
-        # else:
-        #     bot2.move()
-        #     time.sleep(1)
+        if board.turn == "black":
+            bot1.move()
+        else:
+            bot2.move()
 
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")
