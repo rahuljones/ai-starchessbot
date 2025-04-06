@@ -1,7 +1,7 @@
 import pygame
 
 from data.classes.Board import Board
-from data.classes.bots.random_bot import Bot
+from data.classes.bots.random_bot import RandomBot
 
 pygame.init()
 
@@ -19,8 +19,8 @@ def draw(display):
 
 if __name__ == "__main__":
     running = True
-    bot1 = Bot("black", board)
-    bot2 = Bot("white", board)
+    bot1 = RandomBot()
+    bot2 = RandomBot()
     while running:
         mx, my = pygame.mouse.get_pos()
         for event in pygame.event.get():
@@ -34,9 +34,11 @@ if __name__ == "__main__":
                     print(board.last_captured)
 
         if board.turn == "black":
-            bot1.move()
+            m = bot1.move("black", board)
+            board.handle_move(m[0], m[1])
         else:
-            bot2.move()
+            m = bot2.move("white", board)
+            board.handle_move(m[0], m[1])
 
 
         if board.is_in_checkmate("black"):  # If black is in checkmate
