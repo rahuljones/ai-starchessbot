@@ -1,3 +1,6 @@
+import copy
+import random
+
 class MinimaxBot:
     """
     This is a sample minimax bot that uses the minimax algorithm to choose the best move.
@@ -22,6 +25,7 @@ class MinimaxBot:
             "R": 5, # rook
             "S": 5, # star
             "Q": 9, # queen
+            "J": 9, # joker
             "K": 100 # king
         }
         evaluation = 0
@@ -29,7 +33,7 @@ class MinimaxBot:
         for x in board_state:
             for y in x:
                 if y != "":
-                    piece = board_state[x][y]
+                    piece = y
                     piece_value = SCORES_DICT[piece[1]]
                     if piece[0] == 'b' and side == 'black':
                         evaluation += piece_value
@@ -40,7 +44,7 @@ class MinimaxBot:
         return evaluation
     
     def simulate_move(self, board, start_pos, end_pos):
-        new_board = board.copy()  
+        new_board = copy.deepcopy(board)
         new_board.handle_move(start_pos, end_pos)
         return new_board
     
@@ -65,7 +69,7 @@ class MinimaxBot:
             return min_eval
 
     def get_best_move_minimax(self, board, side, depth):
-        best_move = None
+        best_move = []
         best_value = float('-inf')
         moves = board.get_all_valid_moves(side)
         for init_pos, end_pos in moves:
@@ -73,8 +77,10 @@ class MinimaxBot:
             move_value = self.minimax(simulated_board, side, depth - 1, False)
             if move_value > best_value:
                 best_value = move_value
-                best_move = (init_pos, end_pos)
-        return best_move
+                best_move = [(init_pos, end_pos)]
+            elif move_value == best_value:
+                best_move.append((init_pos, end_pos))
+        return best_move[0] if len(best_move) == 1 else random.choice(best_move)
         
     def move(self, side, board):
         best_move = self.get_best_move_minimax(board, side, self.depth)
