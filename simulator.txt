@@ -1,0 +1,19 @@
+To test out your bot use the simulator.py
+
+Usage:
+python simulator.py [--bot1 BOT_NAME] [--bot2 BOT_NAME] [--delay MS] [--simulations N]
+
+Argument	Description	Default
+--bot1	Name of the bot module for black pieces (e.g. random_bot)	random_bot
+--bot2	Name of the bot module for white pieces (e.g. random_bot)	random_bot
+--delay	Delay in milliseconds between moves	500
+--simulations	Number of games to simulate	1
+
+Example:
+python simulator.py --bot1 random_bot --bot2 aggressive_bot --delay 300 --simulations 10
+
+Bot Requirements:
+
+Bot modules must be in data/classes/bots/
+
+Each module should have a 'Bot' class with a method 'move'
