@@ -29,6 +29,7 @@ class Bot:
             "Q": 9, # queen
             "K": 100, # king
             "J": 9 # joker
+
         }
         moves = self.get_possible_moves(side, board)
         best_move = []
@@ -72,6 +73,7 @@ class Bot:
                     else:
                         evaluation -= piece_value
         return evaluation
+
     
     def move(self, side, board):
         best_move = self.evaluate_move(side, board)
