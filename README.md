@@ -34,9 +34,7 @@ Here is some suggested algorithms to try and implement:
     - [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search)
     - [Chess Programming Wiki](https://www.chessprogramming.org/Monte-Carlo_Tree_Search)
     - [Medium Article](https://medium.com/@ishaan.gupta0401/monte-carlo-tree-search-application-on-chess-5573fc0efb75) by Ishaan Gupta
-4. Policy Gradients:
-    - [Wikipedia]
-5. Reinforcement Learning Algorithms:
+4. Reinforcement Learning Algorithms:
     - [Chess Programming Wiki](https://www.chessprogramming.org/Reinforcement_Learning)
     - [Medium Article](https://medium.com/@samgill1256/reinforcement-learning-in-chess-73d97fad96b3) by @Aditya
-    - [policy gradient](https://en.wikipedia.org/wiki/Policy_gradient_method)
+    - [Policy Gradients](https://en.wikipedia.org/wiki/Policy_gradient_method)
