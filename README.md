@@ -12,10 +12,31 @@ You are welcome to look over the repository to get better ideas on how you shoul
 
 - Random Bot: The bot chooses random move.
 - Single Step Optimized Bot: The bot chooses the best move among the all possible moves at the moment. It does not consider the consequences of later moves.
-- Minimax Bot: The bot is implemented with minimax algorithm (check [wiki](https://en.wikipedia.org/wiki/Minimax) and [datacamp](https://www.datacamp.com/tutorial/minimax-algorithm-for-ai-in-python)). However, we cannot guarentee the bot will work as expected, as it serves as an example for how your bot can be optimized.
+- Minimax Bot: The bot is implemented with minimax algorithm (check [Resources](#resources)). However, we cannot guarentee the bot will work as expected, as it serves as an example for how your bot can be optimized.
 
 ⚠️ Warning: Please do not call API for other chess engines (such as Stockfish) because our chess rule and the implementation is different.
 
 ## Submission
 
-You should only submit your [`bot.py`](data/classes/bots/bot.py), which should include class `Bot` with function `move()`.
+You should only submit your [`bot.py`](data/classes/bots/bot.py), which should include class `Bot` with function `move()`. Check [`bot.py`](data/classes/bots/bot.py) to see the submission format.
+
+## Resources
+
+Here is some suggested algorithms to try and implement:
+
+1. Minimax Algorithm:
+    - [Wikipedia](https://en.wikipedia.org/wiki/Minimax)
+    - [Datacamp](https://www.datacamp.com/tutorial/minimax-algorithm-for-ai-in-python)
+2. Alpha-beta pruning:
+    - [Wikipedia](https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning)
+    - [Chess Programming Wiki](https://www.chessprogramming.org/Alpha-Beta)
+3. Monte-Carlo Tree Search:
+    - [Wikipedia](https://en.wikipedia.org/wiki/Monte_Carlo_tree_search)
+    - [Chess Programming Wiki](https://www.chessprogramming.org/Monte-Carlo_Tree_Search)
+    - [Medium Article](https://medium.com/@ishaan.gupta0401/monte-carlo-tree-search-application-on-chess-5573fc0efb75) by Ishaan Gupta
+4. Policy Gradients:
+    - [Wikipedia]
+5. Reinforcement Learning Algorithms:
+    - [Chess Programming Wiki](https://www.chessprogramming.org/Reinforcement_Learning)
+    - [Medium Article](https://medium.com/@samgill1256/reinforcement-learning-in-chess-73d97fad96b3) by @Aditya
+    - [policy gradient](https://en.wikipedia.org/wiki/Policy_gradient_method)

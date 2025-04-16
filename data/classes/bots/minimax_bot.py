@@ -9,11 +9,12 @@ class MinimaxBot:
     This is a basic implementation and may not be optimal for all scenarios. 
     You are responsible for testing and improving the bot's performance. We recommend using depth 1 at first.
     We also recommend using a more advanced evaluation function for better performance.
-    Warning: we have set a hard time limit of 0.1 second for the bot to make a move. 
-    If your bot takes longer than that, it will be terminated and our evaluation server will choose random moves.
+    Warning: we have set a hard time limit of 0.1 second for the bot to make a move. If your bot takes 
+    longer than that, it will be terminated and our evaluation server will choose random moves. We have tested
+    the bot with different depths and it nearly always exceeds the time limit if the depth is greater than 2.
     """
     def __init__(self):
-        self.depth = 1
+        self.depth = 1 ## Please set the depth <= 2 unless you are sure your bot runs within the time limit.
 
     def get_possible_moves(self, side, board):
         return board.get_all_valid_moves(side)
