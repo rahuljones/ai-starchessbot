@@ -11,6 +11,8 @@ ACM Chess is a variant of traditional chess played on a **6x6 board** with modif
 - **1 Bishop** to the right of the King
 - **1 Star** (special piece) on the far-right side
 
+![Rook](https://github.com/user-attachments/assets/2fcb40f5-efcc-42e1-9eb7-2fadadca4333)
+
 ## Objective
 
 The objective of ACM Chess is to **Capture** your opponent’s King while following the modified board and piece movements.
