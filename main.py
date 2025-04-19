@@ -24,6 +24,7 @@ if __name__ == "__main__":
     running = True
     bot1 = MultiThreadedMinimaxBot()
     bot2 = MultiThreadedMinimaxBot()
+
     while running:
         mx, my = pygame.mouse.get_pos()
         for event in pygame.event.get():
