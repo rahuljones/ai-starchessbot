@@ -57,6 +57,7 @@ Your bot will be matched against every other submitted bot in a round robin styl
 
 Your bot will have 0.1 seconds to make a move. If your bot exceeds this time, a random move will be made on your bot's behalf. Likewise, if your bot returns an illegal move, a random move will also be made. **If your bot fails to compile, your bot will not be entered into the round robin tournamet, and score 0 points by default.**
 
+
 ## Packages
 
 Please check [`requirements.py`](requirements.txt). Beside built-in modules, the modules on that list are the only 3rd party libraries we allow.

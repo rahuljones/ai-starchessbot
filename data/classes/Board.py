@@ -162,4 +162,4 @@ class Board:
                     output.append((square.pos, move.pos))
         return output
     def is_in_draw(self):
-        return self.num_moves >= 50
+        return self.num_moves >= 100
