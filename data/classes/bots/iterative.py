@@ -102,8 +102,9 @@ class Bot:
         
         # Internal state for iterative deepening (optional, e.g., for move ordering)
         self.best_move_from_last_iter = None
+        self.SCORES_DICT = SCORES_DICT 
 
-
+    
     # --- Core Search Logic (largely unchanged) ---
 
     def get_possible_moves(self, side, board):
