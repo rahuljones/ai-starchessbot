@@ -1,185 +1,294 @@
-import copy
+import time
 import random
+import copy
+import pygame
 import concurrent.futures
-import os # Needed for os.cpu_count()
+import math
+import os 
+
+def deepcopy_ignore_surfaces(obj, memo=None):
+    """
+    Performs a deep copy of an object, skipping Pygame surfaces.
+    Crucial for copying game states without duplicating large graphical assets.
+    """
+    if memo is None:
+        memo = {}
+
+    if id(obj) in memo:
+        return memo[id(obj)]
+
+    if isinstance(obj, pygame.Surface):
+        return obj # Return the original surface, don't copy
+
+    if isinstance(obj, dict):
+        copied = {}
+        memo[id(obj)] = copied
+        for k, v in obj.items():
+            copied[deepcopy_ignore_surfaces(k, memo)] = deepcopy_ignore_surfaces(v, memo)
+        return copied
+
+    # Handle lists
+    elif isinstance(obj, list):
+        copied = []
+        memo[id(obj)] = copied
+        for item in obj:
+            copied.append(deepcopy_ignore_surfaces(item, memo))
+        return copied
+
+    elif hasattr(obj, '__dict__'):
+        copied = obj.__class__.__new__(obj.__class__)
+        memo[id(obj)] = copied
+        for k, v in obj.__dict__.items():
+            setattr(copied, k, deepcopy_ignore_surfaces(v, memo))
+        return copied
+
+    else:
+        return copy.deepcopy(obj, memo)
 
 class Bot:
     """
-    This is a sample minimax bot that uses the minimax algorithm to choose the best move.
-    It evaluates the board state and simulates moves to find the optimal one.
-    This is a basic implementation and may not be optimal for all scenarios.
-    You are responsible for testing and improving the bot's performance. We recommend using depth 1 at first.
-    We also recommend using a more advanced evaluation function for better performance.
-    Warning: we have set a hard time limit of 0.1 second for the bot to make a move. If your bot takes
-    longer than that, it will be terminated and our evaluation server will choose random moves. We have tested
-    the bot with different depths and it nearly always exceeds the time limit if the depth is greater than 2.
+    Minimax bot modified to use Alpha-Beta pruning and multi-threading
+    for the first level of moves, aiming for minimal changes to the original structure.
 
-    Multithreaded/Multiprocessed Notes:
-    - Uses concurrent.futures.ProcessPoolExecutor to parallelize the evaluation of top-level moves.
-    - minimax and evaluate_board are now static methods to be easily callable by child processes.
-    - Assumes the board object returned by board.copy_logical_state() is pickleable.
-    - Overhead of process creation means this might only be faster for depth >= 2 and sufficient moves.
+    Attributes:
+        depth (int): Search depth. WARNING: Depths > 2 likely exceed 0.1s limit.
+        max_threads (int): Max threads for parallelization.
+        time_limit (float): Target time limit (for reporting).
     """
-    SCORES_DICT = {
-        " ": 1, # pawn
-        "N": 3, # knight
-        "B": 3, # bishop
-        "R": 5, # rook
-        "S": 5, # star
-        "Q": 9, # queen
-        "J": 9, # joker
-        "K": 10000 # king
-    }
+    def __init__(self, depth=2, time_limit=0.095):
+        """
+        Initializes the bot.
 
-    def __init__(self):
-        # Set depth carefully. Multiprocessing adds overhead.
-        # Depth 2 might be feasible now, but test against the 0.1s limit.
-        self.depth = 2 # Example: increased depth, test performance!
+        Args:
+            depth (int): Search depth. Defaults to 2.
+            time_limit (float): Approximate time limit.
+        """
+        self.depth = depth ## Please set the depth <= 2 unless you are sure your bot runs within the time limit.
+        self.time_limit = time_limit
+        self.calculation_time = 0
+
+        # Determine max threads, similar to the previous version
+        cpu_cores = os.cpu_count()
+        self.max_threads = cpu_cores if cpu_cores else 4
+        self.max_threads = min(self.max_threads, 8) # Cap threads
+
+        # Piece scores (kept from original)
+        self.SCORES_DICT = {
+            " ": 1,   # pawn
+            "N": 3,   # knight
+            "B": 3,   # bishop
+            "R": 5,   # rook
+            "S": 5,   # star
+            "Q": 9,   # queen
+            "J": 9,   # joker
+            "K": 1000 # king (Increased value for safety)
+        }
+
+    # --- Functions largely unchanged from original minimax_bot.py ---
 
     def get_possible_moves(self, side, board):
+        """Gets all valid moves for the given side."""
         return board.get_all_valid_moves(side)
 
-    @staticmethod
-    def evaluate_board(side, board):
-        """Static method to evaluate the board state."""
+    def evaluate_board(self, board, player_side):
+        """
+        Evaluates the board state based on material count.
+        Modified slightly to check terminal states first.
+        """
         evaluation = 0
-        board_state = board.get_board_state()
-        for x in board_state:
-            for y in x:
-                if y != "":
-                    piece = y
-                    # Use Bot.SCORES_DICT as it's now a class variable
-                    piece_value = Bot.SCORES_DICT[piece[1]]
-                    if piece[0] == 'b' and side == 'black':
-                        evaluation += piece_value
-                    elif piece[0] == 'w' and side == 'white':
+        opponent_side = 'black' if player_side == 'white' else 'white'
+
+        # Check for terminal states first for potentially infinite scores
+        if board.is_in_checkmate(opponent_side):
+            return float('inf') # Current player wins
+        if board.is_in_checkmate(player_side):
+            return float('-inf') # Current player loses
+        if board.is_in_draw():
+            return 0 # Draw
+
+        # Original material counting logic
+        board_state = board.get_board_state() # Gets the 6x6 array representation
+        for y in range(len(board_state)):
+            for x in range(len(board_state[y])):
+                piece_code = board_state[y][x] # e.g., "wP", "bK", ""
+                if piece_code != "":
+                    piece_color_char = piece_code[0] # 'w' or 'b'
+                    piece_type_char = piece_code[1]  # 'P', 'N', 'K', etc. (original used ' ' for pawn)
+
+                    # Adjust notation if needed (original used ' ' for pawn notation)
+                    notation_key = piece_type_char if piece_type_char != 'P' else ' '
+                    # Handle Joker ('J') if pawn promotion implemented correctly in Board
+                    if piece_type_char == 'J': notation_key = 'J'
+
+
+                    piece_value = self.SCORES_DICT.get(notation_key, 0) # Use .get for safety
+
+                    # Add score if the piece belongs to the player_side, subtract otherwise
+                    if (piece_color_char == 'w' and player_side == 'white') or \
+                       (piece_color_char == 'b' and player_side == 'black'):
                         evaluation += piece_value
                     else:
                         evaluation -= piece_value
         return evaluation
 
     def simulate_move(self, board, start_pos, end_pos):
-        """Simulates a move and returns the new board state. (Instance method is fine here)"""
-        # Use copy_logical_state() which is likely more efficient and potentially pickle-friendly
-        new_board = board.copy_logical_state()
+        """Creates a deep copy (ignoring surfaces) and simulates a move."""
+        try:
+            new_board = deepcopy_ignore_surfaces(board)
+            success = new_board.handle_move(start_pos, end_pos)
+            # handle_move changes the turn internally in the board object
+            if not success: return None
+            return new_board
+        except Exception as e:
+            # print(f"Error in simulate_move: {e}")
+            return None
 
-        # handle_move should ideally not fail if the move came from get_all_valid_moves,
-        # but check just in case. handle_move modifies new_board in place.
-        success = new_board.handle_move(start_pos, end_pos)
-        if not success:
-             # This scenario might indicate a bug in move generation or handle_move
-             print(f"WARNING: Simulated move failed! {start_pos} -> {end_pos} on board state:")
-             print(board.get_board_state()) # Print state *before* failed move
-             # Returning the original state copy might be safest here to avoid errors down the line
-             return board.copy_logical_state()
-        return new_board
+    # --- Minimax function modified for Alpha-Beta ---
 
-    @staticmethod
-    def minimax(board, side, depth, maximizing_player):
-        """Static minimax method for use in multiprocessing."""
-        if depth == 0 or board.is_in_checkmate(side):
-            # Call static evaluate_board
-            return Bot.evaluate_board(side, board)
+    def minimax(self, board, side, depth, alpha, beta, maximizing_player):
+        """
+        Minimax algorithm with Alpha-Beta pruning.
 
-        # Note: We need a way to simulate moves within the static method context.
-        # Assuming board objects have the necessary methods directly.
+        Args:
+            board: Current board state.
+            side: The player whose turn it is on this board.
+            depth: Remaining search depth.
+            alpha: Alpha value for pruning.
+            beta: Beta value for pruning.
+            maximizing_player: Boolean, True if current node is maximizing.
+
+        Returns:
+            Evaluation score for the board state.
+        """
+
+        # Check if terminal state or depth limit reached
+        is_terminal = board.is_in_checkmate('white') or \
+                      board.is_in_checkmate('black') or \
+                      board.is_in_draw()
+
+        if depth == 0 or is_terminal:
+            # Evaluate from the perspective of the player whose turn it is *at this node*
+            return self.evaluate_board(board, side)
+
         moves = board.get_all_valid_moves(side)
-
-        # --- Helper function to simulate move within static context ---
-        # This assumes board.copy_logical_state and board.handle_move work correctly
-        # on the board object passed to this static method.
-        def _static_simulate_move(current_board, start_pos, end_pos):
-            new_board_state = current_board.copy_logical_state()
-            success = new_board_state.handle_move(start_pos, end_pos)
-            if not success:
-                # Handle error - perhaps return None or raise an exception
-                # For simplicity here, we might just rely on valid moves
-                # but in production, robust handling is needed.
-                print(f"Static Sim Error: {start_pos}->{end_pos}")
-                return current_board # Return original board on failure
-            return new_board_state
-        # --- End Helper ---
+        if not moves: # Handle case where no moves are possible (stalemate/checkmate)
+             return self.evaluate_board(board, side)
 
 
         if maximizing_player:
             max_eval = float('-inf')
             for init_pos, end_pos in moves:
-                # Use the helper for simulation
-                simulated_board = _static_simulate_move(board, init_pos, end_pos)
-                # Recursive call to static minimax
-                eval_score = Bot.minimax(simulated_board, side, depth - 1, False)
+                simulated_board = self.simulate_move(board, init_pos, end_pos)
+                if simulated_board is None: continue # Skip if simulation failed
+
+                opponent_side = simulated_board.turn # Get the side whose turn it is now
+                eval_score = self.minimax(simulated_board, opponent_side, depth - 1, alpha, beta, False) # Opponent minimizes
                 max_eval = max(max_eval, eval_score)
+                alpha = max(alpha, eval_score) # Update alpha
+                if beta <= alpha:
+                    break # Beta cut-off
             return max_eval
         else: # Minimizing player
             min_eval = float('inf')
             for init_pos, end_pos in moves:
-                 # Use the helper for simulation
-                simulated_board = _static_simulate_move(board, init_pos, end_pos)
-                 # Recursive call to static minimax
-                eval_score = Bot.minimax(simulated_board, side, depth - 1, True)
+                simulated_board = self.simulate_move(board, init_pos, end_pos)
+                if simulated_board is None: continue # Skip if simulation failed
+
+                opponent_side = simulated_board.turn # Get the side whose turn it is now
+                eval_score = self.minimax(simulated_board, opponent_side, depth - 1, alpha, beta, True) # Opponent maximizes
                 min_eval = min(min_eval, eval_score)
+                beta = min(beta, eval_score) # Update beta
+                if beta <= alpha:
+                    break # Alpha cut-off
             return min_eval
 
-    def get_best_move_minimax(self, board, side, depth):
-        """Finds the best move using minimax, parallelizing the first level."""
-        if depth == 0: # Should not happen if self.depth > 0, but safe check
-             moves = self.get_possible_moves(side, board)
-             return random.choice(moves) if moves else None
 
-        best_move_candidates = []
+    # --- Function to orchestrate threaded evaluation ---
+    def _evaluate_move_task(self, move, board, side, depth):
+        """Helper task for threading: simulates move, calls minimax."""
+        start_pos, end_pos = move
+        simulated_board = self.simulate_move(board, start_pos, end_pos)
+        if simulated_board is None:
+            return (move, float('-inf')) # Failed simulation
+
+        # After the first move, it's opponent's turn (minimizing). Call minimax.
+        opponent_side = simulated_board.turn
+        # Initial alpha/beta for the recursive call
+        score = self.minimax(simulated_board, opponent_side, depth - 1, float('-inf'), float('inf'), False) # Opponent is minimizing player
+
+        return (move, score)
+
+    def get_best_move_minimax_threaded(self, board, side, depth):
+        """
+        Finds the best move using Minimax+AlphaBeta, parallelizing the first level.
+        (Replaces original get_best_move_minimax).
+        """
+        best_moves = [] # Store potentially multiple best moves
         best_value = float('-inf')
-        moves = self.get_possible_moves(side, board)
+        moves = board.get_all_valid_moves(side)
 
-        # Use ProcessPoolExecutor for CPU-bound tasks
-        # Defaults to os.cpu_count() workers, adjust max_workers if needed
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            futures_map = {}
-            for init_pos, end_pos in moves:
-                # Simulate the move in the main process
-                simulated_board = self.simulate_move(board, init_pos, end_pos)
+        if not moves: return None
+        if len(moves) == 1: return moves[0] # Only one choice
 
-                # Check if the simulation produced a valid board before submitting
-                if simulated_board:
-                    # Submit the static minimax function to the executor
-                    # It will run minimax for the next level (depth-1) as the minimizing player (False)
-                    future = executor.submit(Bot.minimax, simulated_board, side, depth - 1, False)
-                    futures_map[(init_pos, end_pos)] = future
-                else:
-                    # Handle simulation failure - perhaps assign a very bad score
-                    print(f"Skipping evaluation for failed simulation: {init_pos} -> {end_pos}")
+        results = []
+        num_workers = min(self.max_threads, len(moves))
+        if num_workers <= 0: num_workers = 1
 
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
+            futures = {executor.submit(self._evaluate_move_task, move, board, side, depth): move for move in moves}
 
-            # Collect results as they complete
-            move_results = {}
-            for move, future in futures_map.items():
+            for future in concurrent.futures.as_completed(futures):
+                move = futures[future]
                 try:
-                    # Get the evaluation result from the future
-                    move_results[move] = future.result()
-                except Exception as e:
-                    print(f"Error getting result for move {move}: {e}")
-                    # Assign a very bad score if a process fails
-                    move_results[move] = float('-inf')
+                    _move, move_value = future.result()
+                    results.append((move, move_value)) # Store result
 
-        # Find the best move(s) based on the collected results
-        for move, move_value in move_results.items():
-            if move_value > best_value:
-                best_value = move_value
-                best_move_candidates = [move]
-            elif move_value == best_value:
-                best_move_candidates.append(move)
+                    # Update best score and move(s) found so far
+                    if move_value > best_value:
+                        best_value = move_value
+                        best_moves = [move] # New best move found
+                    elif move_value == best_value:
+                        best_moves.append(move) # Add to list of equally good moves
 
-        # Choose the best move (randomly among equals)
-        return random.choice(best_move_candidates) if best_move_candidates else (None, None) # Return None if no valid moves found/evaluated
+                except Exception as exc:
+                    print(f'Move {move} generated exception: {exc}')
+                    results.append((move, float('-inf'))) # Penalize errors
 
+        # Select the best move from results if the initial tracking failed or for tie-breaking
+        if not best_moves and results:
+            # Sort results and find best score again just in case
+            results.sort(key=lambda item: item[1], reverse=True)
+            if results and results[0][1] > float('-inf'):
+                top_score = results[0][1]
+                best_moves = [m for m, score in results if score == top_score]
+
+        # Final selection: Choose randomly among the best moves found
+        if best_moves:
+            return random.choice(best_moves)
+        elif moves: # Fallback if all evaluations failed
+            # print("Warning: All evaluations failed or returned -inf. Choosing random move.")
+            return random.choice(moves)
+        else:
+            return None # No moves possible
 
     def move(self, side, board):
-        """Selects the best move using the parallelized minimax."""
-        # Make sure depth is at least 1 for the parallel logic to work well
-        if self.depth < 1:
-             print("Warning: Depth is less than 1, minimax requires at least depth 1.")
-             # Fallback or default behavior if depth is 0
-             moves = self.get_possible_moves(side, board)
-             return random.choice(moves) if moves else (None, None)
+        """Calculates the best move using threaded Minimax+AlphaBeta."""
+        start_time = time.time()
 
-        best_move = self.get_best_move_minimax(board, side, self.depth)
+        best_move = self.get_best_move_minimax_threaded(board, side, self.depth)
+
+        self.calculation_time = time.time() - start_time
+        print(f"Bot ({side}): Chose {best_move}. Time: {self.calculation_time:.4f}s")
+
+        if self.calculation_time > self.time_limit:
+            print(f"Warning: Time limit exceeded ({self.calculation_time:.4f}s > {self.time_limit}s)")
+            pass
+
+        if best_move is None:
+            possible_moves = board.get_all_valid_moves(side)
+            if possible_moves:
+                return random.choice(possible_moves)
+            else:
+                return None 
+
         return best_move

@@ -3,7 +3,7 @@ import copy
 import random
 
 import pygame
-
+import time
 
 
 def deepcopy_ignore_surfaces(obj, memo=None):
@@ -54,7 +54,7 @@ class Bot:
     the bot with different depths and it nearly always exceeds the time limit if the depth is greater than 2.
     """
     def __init__(self):
-        self.depth = 1 ## Please set the depth <= 2 unless you are sure your bot runs within the time limit.
+        self.depth = 2 ## Please set the depth <= 2 unless you are sure your bot runs within the time limit.
     
 
     def get_possible_moves(self, side, board):
@@ -126,5 +126,7 @@ class Bot:
         return best_move[0] if len(best_move) == 1 else random.choice(best_move)
         
     def move(self, side, board):
+        start_time = time.time()
         best_move = self.get_best_move_minimax(board, side, self.depth)
+        print(f"Time taken: {time.time() - start_time:.4f} seconds")
         return best_move
