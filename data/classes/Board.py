@@ -26,6 +26,7 @@ class Board:
         ]
         self.squares = self.generate_squares()
         self.last_captured = 0
+        self.num_moves = 0
         self.setup_board()
 
     def generate_squares(self):
@@ -102,6 +103,7 @@ class Board:
                     self.selected_piece = clicked_square.occupying_piece
         # successfully made a move
         elif self.selected_piece.move(self, clicked_square):
+            self.num_moves += 1
             self.turn = "white" if self.turn == "black" else "black"
             print(self.get_board_state())
 
@@ -143,6 +145,7 @@ class Board:
         if start_square.occupying_piece.move(self, end_square):
             self.turn = "white" if self.turn == "black" else "black"
             print(self.get_board_state())
+            self.num_moves += 1
             return True
 
     def alg_not_to_pos(self, alg_not):
@@ -159,4 +162,4 @@ class Board:
                     output.append((square.pos, move.pos))
         return output
     def is_in_draw(self):
-        return self.last_captured >= 100
+        return self.num_moves >= 50

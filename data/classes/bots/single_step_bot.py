@@ -1,7 +1,7 @@
 #### This is a bot that choose optimal step with only one depth ####
 import random
 
-class SingleStepBot:
+class Bot:
     """
     A bot that chooses the best move based on a simple evaluation function.
     It evaluates the possible moves and selects the one with the highest score.
@@ -27,7 +27,9 @@ class SingleStepBot:
             "R": 5, # rook
             "S": 5, # star
             "Q": 9, # queen
-            "K": 100 # king
+            "K": 100, # king
+            "J": 9 # joker
+
         }
         moves = self.get_possible_moves(side, board)
         best_move = []
@@ -54,7 +56,8 @@ class SingleStepBot:
             "R": 5,
             "S": 5, 
             "Q": 9,
-            "K": 100
+            "K": 100,
+            "J": 9
         }
         evaluation = 0
         board_state = board.get_board_state()
@@ -70,6 +73,7 @@ class SingleStepBot:
                     else:
                         evaluation -= piece_value
         return evaluation
+
     
     def move(self, side, board):
         best_move = self.evaluate_move(side, board)

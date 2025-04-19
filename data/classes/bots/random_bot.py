@@ -1,6 +1,6 @@
 import random
 
-class RandomBot:
+class Bot:
     """
     A bot that makes random moves.
     """
