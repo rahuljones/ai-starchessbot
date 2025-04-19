@@ -2,7 +2,7 @@
 import copy
 import random
 
-class MinimaxBot:
+class Bot:
     """
     This is a sample minimax bot that uses the minimax algorithm to choose the best move.
     It evaluates the board state and simulates moves to find the optimal one.

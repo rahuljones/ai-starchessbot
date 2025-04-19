@@ -1,7 +1,7 @@
 #### This is a bot that choose optimal step with only one depth ####
 import random
 
-class SingleStepBot:
+class Bot:
     """
     A bot that chooses the best move based on a simple evaluation function.
     It evaluates the possible moves and selects the one with the highest score.
