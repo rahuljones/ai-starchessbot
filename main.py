@@ -5,6 +5,7 @@ from data.classes.bots.random_bot import Bot as RandomBot
 from data.classes.bots.single_step_bot import Bot as SingleStepBot
 from data.classes.bots.minimax_bot import Bot as MinimaxBot
 from data.classes.bots.multiThreadedminimaxbot import Bot as MultiThreadedMinimaxBot
+from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 
 pygame.init()
 
@@ -22,8 +23,8 @@ def draw(display):
 
 if __name__ == "__main__":
     running = True
-    bot1 = MultiThreadedMinimaxBot()
-    bot2 = MultiThreadedMinimaxBot()
+    bot1 = MonteCarloBot()
+    bot2 = MonteCarloBot()
 
     while running:
         mx, my = pygame.mouse.get_pos()

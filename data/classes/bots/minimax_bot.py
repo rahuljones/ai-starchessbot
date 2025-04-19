@@ -2,6 +2,46 @@
 import copy
 import random
 
+import pygame
+
+
+
+def deepcopy_ignore_surfaces(obj, memo=None):
+    if memo is None:
+        memo = {}
+
+    if id(obj) in memo:
+        return memo[id(obj)]
+
+    if isinstance(obj, pygame.Surface):
+        return obj
+
+    if isinstance(obj, dict):
+        copied = {}
+        memo[id(obj)] = copied
+        for k, v in obj.items():
+            copied[deepcopy_ignore_surfaces(k, memo)] = deepcopy_ignore_surfaces(v, memo)
+        return copied
+
+    elif isinstance(obj, list):
+        copied = []
+        memo[id(obj)] = copied
+        for item in obj:
+            copied.append(deepcopy_ignore_surfaces(item, memo))
+        return copied
+
+    elif hasattr(obj, '__dict__'):
+        copied = obj.__class__.__new__(obj.__class__)
+        memo[id(obj)] = copied
+        for k, v in obj.__dict__.items():
+            setattr(copied, k, deepcopy_ignore_surfaces(v, memo))
+        return copied
+
+    else:
+        return copy.deepcopy(obj, memo)
+    
+
+
 class Bot:
     """
     This is a sample minimax bot that uses the minimax algorithm to choose the best move.
@@ -15,6 +55,7 @@ class Bot:
     """
     def __init__(self):
         self.depth = 1 ## Please set the depth <= 2 unless you are sure your bot runs within the time limit.
+    
 
     def get_possible_moves(self, side, board):
         return board.get_all_valid_moves(side)
@@ -28,7 +69,7 @@ class Bot:
             "S": 5, # star
             "Q": 9, # queen
             "J": 9, # joker
-            "K": 10000 # king
+            "K": 100 # king
         }
         evaluation = 0
         board_state = board.get_board_state()
@@ -46,18 +87,8 @@ class Bot:
         return evaluation
     
     def simulate_move(self, board, start_pos, end_pos):
-        # new_board = copy.deepcopy(board) # <-- REMOVE THIS LINE
-        new_board = board.copy_logical_state() # <-- ADD THIS LINE
-
-        # handle_move should ideally not fail if the move came from get_all_valid_moves,
-        # but check just in case. handle_move modifies new_board in place.
-        success = new_board.handle_move(start_pos, end_pos)
-        if not success:
-             # This scenario might indicate a bug in move generation or handle_move
-             print(f"WARNING: Simulated move failed! {start_pos} -> {end_pos} on board state:")
-             print(board.get_board_state()) # Print state *before* failed move
-             # Returning the original state copy might be safest here to avoid errors down the line
-             return board.copy_logical_state()
+        new_board = deepcopy_ignore_surfaces(board)
+        new_board.handle_move(start_pos, end_pos)
         return new_board
     
     def minimax(self, board, side, depth, maximizing_player):
