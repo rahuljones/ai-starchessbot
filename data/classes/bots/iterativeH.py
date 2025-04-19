@@ -255,5 +255,8 @@ class Bot:
         if best_move_overall is None:
             best_move_overall = random.choice(initial_moves) if initial_moves else None
 
+        if self.calculation_time > self.time_limit:
+            print(f"iterH Warning: Calculation time exceeded: {self.calculation_time:.3f} seconds.")
+
         self.best_move_from_last_iter = None
         return best_move_overall

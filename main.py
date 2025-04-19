@@ -7,6 +7,8 @@ from data.classes.bots.minimax_bot import Bot as MinimaxBot
 from data.classes.bots.multiThreadedminimaxbot import Bot as MultiThreadedMinimaxBot
 from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 from data.classes.bots.iterative import Bot as IterativeBot
+from data.classes.bots.iterativeH import Bot as IterativeBotH
+from data.classes.bots.iterative_no_thread import Bot as IterativeNoThreadedBot
 
 pygame.init()
 
@@ -35,8 +37,8 @@ SCORES_DICT = {
 
 if __name__ == "__main__":
     running = True
-    bot1 = IterativeBot()
-    bot2 = IterativeBot(SCORES_DICT=SCORES_DICT)
+    bot1 = IterativeNoThreadedBot()
+    bot2 = IterativeNoThreadedBot()
 
     while running:
         mx, my = pygame.mouse.get_pos()
@@ -53,10 +55,11 @@ if __name__ == "__main__":
         if board.turn == "black":
             m = bot1.move("black", board)
             board.handle_move(m[0], m[1])
+            print("Black moved\n")
         else:
             m = bot2.move("white", board)
             board.handle_move(m[0], m[1])
-
+            print("White moved\n")
 
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")

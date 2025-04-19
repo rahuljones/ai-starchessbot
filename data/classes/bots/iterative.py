@@ -82,7 +82,7 @@ class Bot:
         max_threads (int): Max threads for parallelization within each depth search.
         time_limit (float): Target time limit per move in seconds.
     """
-    def __init__(self, max_depth=10, time_limit=0.095, SCORES_DICT=SCORES_DICT):
+    def __init__(self, max_depth=7, time_limit=0.090, SCORES_DICT=SCORES_DICT):
         """
         Initializes the bot.
 
@@ -101,7 +101,7 @@ class Bot:
         self.max_threads = min(self.max_threads, 8) # Cap threads
         
         # Internal state for iterative deepening (optional, e.g., for move ordering)
-        self.best_move_from_last_iter = None
+        # self.best_move_from_last_iter = None
         self.SCORES_DICT = SCORES_DICT 
 
     
@@ -111,39 +111,47 @@ class Bot:
         """Gets all valid moves for the given side."""
         return board.get_all_valid_moves(side)
 
+    # --- Potential replacement for evaluate_board ---
     def evaluate_board(self, board, player_side):
-        """
-        Evaluates the board state based on material count.
-        Checks terminal states first.
-        """
         evaluation = 0
         opponent_side = 'black' if player_side == 'white' else 'white'
 
-        # Check for terminal states first for potentially infinite scores
         if board.is_in_checkmate(opponent_side):
-            return float('inf') # Current player wins
+            return float('inf')
         if board.is_in_checkmate(player_side):
-            return float('-inf') # Current player loses
+            return float('-inf')
         if board.is_in_draw():
-            return 0 # Draw
+            return 0
 
-        # Material counting logic
-        board_state = board.get_board_state() # Gets the 6x6 array representation
+        board_state = board.get_board_state()
         for y in range(len(board_state)):
             for x in range(len(board_state[y])):
-                piece_code = board_state[y][x] # e.g., "wP", "bK", ""
+                piece_code = board_state[y][x]
                 if piece_code != "":
-                    piece_color_char = piece_code[0] # 'w' or 'b'
-                    piece_type_char = piece_code[1]  # 'P', 'N', 'K', etc.
-                    notation_key = piece_type_char if piece_type_char != 'P' else ' '
-                    if piece_type_char == 'J': notation_key = 'J'
+                    piece_color_char = piece_code[0]
+                    piece_type_char = piece_code[1]
+
+                    notation_key = piece_type_char if piece_type_char != "P" else " "
+                    if piece_type_char == "J":
+                        notation_key = "J"
+
                     piece_value = self.SCORES_DICT.get(notation_key, 0)
 
-                    if (piece_color_char == 'w' and player_side == 'white') or \
-                       (piece_color_char == 'b' and player_side == 'black'):
-                        evaluation += piece_value
+                    positional_bonus = 0
+                    if piece_type_char == "P":
+                        if piece_color_char == "w":
+                            positional_bonus = self.PAWN_TABLE[y][x]
+                        else:
+                            mirrored_y = 5 - y
+                            positional_bonus = self.PAWN_TABLE[mirrored_y][x]
+
+                    total_value = piece_value + positional_bonus
+
+                    if (piece_color_char == "w" and player_side == "white") or \
+                       (piece_color_char == "b" and player_side == "black"):
+                        evaluation += total_value
                     else:
-                        evaluation -= piece_value
+                        evaluation -= total_value
         return evaluation
 
     def simulate_move(self, board, start_pos, end_pos):
@@ -313,42 +321,37 @@ class Bot:
             # For simplicity, let's stop if less than ~10-20% of time limit remains.
             # Or if elapsed time already exceeds limit significantly.
             if time_remaining < (self.time_limit * 0.1) or time_elapsed > self.time_limit * 0.95 :
-                 # print(f"ID: Time limit approaching ({time_elapsed:.3f}s). Stopping at depth {depth-1}.")
-                 break
+                # print(f"ID: Time limit approaching ({time_elapsed:.3f}s). Stopping at depth {depth-1}.")
+                break
 
-            # print(f"ID: Starting search at depth {depth}...")
+            print(f"ID: Starting search at depth {depth}...")
             try:
                 current_best_move, current_best_score = self.get_best_move_at_depth(board, side, depth)
 
                 # Store the best move found at this completed depth
                 if current_best_move is not None:
                     best_move_overall = current_best_move
-                    self.best_move_from_last_iter = current_best_move # Store for potential move ordering next iter
-                    # print(f"ID: Depth {depth} completed. Best move: {best_move_overall} Score: {current_best_score:.2f}")
+                    # self.best_move_from_last_iter = current_best_move #Store for potential move ordering next iter
+                    print(f"\tID: Depth {depth} completed. Best move: {best_move_overall} Score: {current_best_score:.2f}")
+                    print(f"\tID: Time elapsed: {time_elapsed:.3f}s. Time remaining: {time_remaining:.3f}s.")
+                    
 
-                # Optional: Check for checkmate score - can stop early if mate found
                 if current_best_score == float('inf'):
-                    # print(f"ID: Checkmate found at depth {depth}. Stopping early.")
                     break
 
             except Exception as e:
-                # print(f"ID: Error during search at depth {depth}: {e}")
-                # Stop iterative deepening if an error occurs
                 break
 
             # Check time again *after* iteration completes
             time_elapsed_after = time.time() - start_time
             if time_elapsed_after >= self.time_limit:
-                # print(f"ID: Iteration for depth {depth} completed, but time limit exceeded ({time_elapsed_after:.3f}s).")
                 break # Stop even if iteration finished
 
 
         # --- End of Loop ---
         self.calculation_time = time.time() - start_time
 
-        # If no iterations completed successfully, return a random move
         if best_move_overall is None:
-            # print("ID: No depth completed in time or error occurred. Returning random move.")
             best_move_overall = random.choice(initial_moves) if initial_moves else None
 
         # print(f"Bot ({side}): Chose {best_move_overall}. Total Time: {self.calculation_time:.4f}s")
@@ -356,5 +359,5 @@ class Bot:
             print(f"Warning: Total time limit exceeded ({self.calculation_time:.4f}s > {self.time_limit}s)")
             pass
 
-        self.best_move_from_last_iter = None # Reset for next turn
+        # self.best_move_from_last_iter = None # Reset for next turn
         return best_move_overall

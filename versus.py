@@ -8,6 +8,7 @@ from data.classes.bots.multiThreadedminimaxbot import Bot as MultiThreadedMinima
 from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 from data.classes.bots.iterative import Bot as IterativeBot
 from data.classes.bots.iterativeH import Bot as IterativeBotH
+from data.classes.bots.iterative_no_thread import Bot as IterativeNoThreadedBot
 import argparse
 
 pygame.init()
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     bot1 = globals()[args.bot1]()
     # bot2 = globals()[args.bot2]()
 
-    bot2 = IterativeBotH(SCORES_DICT=SCORES_DICT)
+    bot2 = IterativeNoThreadedBot()
 
     running = True
 
