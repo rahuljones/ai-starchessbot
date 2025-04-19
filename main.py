@@ -21,7 +21,7 @@ def draw(display):
 
 if __name__ == "__main__":
     running = True
-    bot1 = SingleStepBot()
+    bot1 = MinimaxBot()
     bot2 = MinimaxBot()
     while running:
         mx, my = pygame.mouse.get_pos()
