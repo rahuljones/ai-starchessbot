@@ -45,7 +45,7 @@ if __name__ == "__main__":
     bot1 = globals()[args.bot1]()
     # bot2 = globals()[args.bot2]()
 
-    bot2 = IterativeBot(SCORES_DICT=SCORES_DICT)
+    bot2 = IterativeBotH(SCORES_DICT=SCORES_DICT)
 
     running = True
 

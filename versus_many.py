@@ -32,7 +32,7 @@ def run_matches(bot1, bot2, num_matches=10):
 if __name__ == "__main__":
     # parser.add_argument("--bot1", type=str, default="IterativeBot", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
     BOT1 = "IterativeBotH"
-    BOT2 = "IterativeBot"
+    BOT2 = "IterativeBotH"
     run_matches(BOT1, BOT2)
     print("switching...")
     run_matches(BOT2, BOT1)

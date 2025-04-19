@@ -42,8 +42,19 @@ def deepcopy_ignore_surfaces(obj, memo=None):
             return obj
 # --- End Helper Function ---
 
+SCORES_DICT = {
+    " ": 1,   # pawn
+    "N": 5,   # knight
+    "B": 3,   # bishop
+    "R": 5,   # rook
+    "S": 5,   # star
+    "Q": 15,  # queen
+    "J": 9,   # joker
+    "K": 10000  # king
+}
+   
 class Bot:
-    def __init__(self, max_depth=10, time_limit=0.095):
+    def __init__(self, max_depth=10, time_limit=0.095, SCORES_DICT=SCORES_DICT):
         self.max_depth = max_depth
         self.time_limit = time_limit
         self.calculation_time = 0
@@ -51,16 +62,7 @@ class Bot:
         cpu_cores = os.cpu_count()
         self.max_threads = min(cpu_cores if cpu_cores else 4, 8)
 
-        self.SCORES_DICT = {
-            " ": 1,   # pawn
-            "N": 5,   # knight
-            "B": 3,   # bishop
-            "R": 5,   # rook
-            "S": 5,   # star
-            "Q": 15,  # queen
-            "J": 9,   # joker
-            "K": 10000  # king
-        }
+        self.SCORES_DICT = SCORES_DICT
 
         self.PAWN_TABLE = [
             [0,   0,   0,   0,   0,   0],
