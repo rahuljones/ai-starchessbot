@@ -32,7 +32,7 @@ if __name__ == "__main__":
                 if event.button == 1:
                     board.handle_click(mx, my)
                     print(board.last_captured)
-
+        # Comment out the next 6 lines if you want to disable bot moves
         if board.turn == "black":
             m = bot1.move("black", board)
             board.handle_move(m[0], m[1])
