@@ -20,7 +20,7 @@ To setup the virtual environment:
 python -m venv venv
 # For MacOS/Linux:
 source venv/bin/activate  
-# On Windows: 
+# On Windows (use command line if powershell gives any issues): 
 venv\Scripts\activate
 ```
 
