@@ -29,6 +29,72 @@ class Board:
         self.num_moves = 0
         self.setup_board()
 
+    def copy_logical_state(self):
+        new_board = Board(self.width, self.height)
+
+        # Copy essential scalar attributes
+        new_board.turn = self.turn
+        new_board.last_captured = self.last_captured
+        new_board.num_moves = self.num_moves
+        # DO NOT copy selected_piece, it's UI state
+
+        # Clear the default pieces placed by new_board's __init__
+        for sq in new_board.squares:
+            sq.occupying_piece = None
+
+        # Map notation (corrected) back to piece classes
+        piece_map = {
+            'R': Rook, 'N': Knight, 'B': Bishop,
+            'Q': Queen, 'K': King, ' ': Pawn, 'S': Star, # Use space for Pawn, S for Star
+            'J': Pawn # Joker starts as a Pawn instance then gets promoted state set
+        }
+
+        # Copy piece logical data from the original board
+        for y in range(6):
+            for x in range(6):
+                original_square = self.get_square_from_pos((x, y))
+                if original_square.occupying_piece:
+                    original_piece = original_square.occupying_piece
+                    new_square = new_board.get_square_from_pos((x, y))
+
+                    # Get the correct class based on the piece's notation
+                    # Handle Pawn separately initially due to promotion possibility
+                    notation_to_lookup = original_piece.notation
+                    if isinstance(original_piece, Pawn) and not original_piece.promoted:
+                        notation_to_lookup = " " # Use space for unpromoted pawn lookup
+                    elif isinstance(original_piece, Pawn) and original_piece.promoted:
+                        notation_to_lookup = "J" # Use J for promoted pawn lookup
+
+
+                    piece_class = piece_map.get(notation_to_lookup)
+
+                    if piece_class:
+                        # Create new piece instance, passing the *new_board* reference.
+                        # The __init__ of pieces loads images, but we will overwrite img later if needed,
+                        # or ideally modify piece init to optionally skip image loading.
+                        # For now, this works but is slightly inefficient loading images we don't need.
+                        new_piece = piece_class((x, y), original_piece.color, new_board)
+
+                        # Copy essential piece attributes
+                        new_piece.has_moved = original_piece.has_moved
+
+                        # Explicitly handle Pawn promotion state for the copy
+                        if isinstance(original_piece, Pawn):
+                            new_piece.promoted = original_piece.promoted
+                            if original_piece.promoted:
+                                new_piece.notation = "J" # Ensure notation is J on the copy
+                            else:
+                                new_piece.notation = " " # Ensure notation is space on the copy
+
+                        # Important: Ensure the new piece doesn't hold a Surface (or handle it)
+                        new_piece.img = None # Explicitly set image to None in the copy
+
+                        new_square.occupying_piece = new_piece
+                    else:
+                        print(f"Warning: Unknown piece notation '{original_piece.notation}' during copy at {(x, y)}.")
+
+        return new_board
+
     def generate_squares(self):
         output = []
         for y in range(6):

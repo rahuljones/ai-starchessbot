@@ -12,7 +12,7 @@ class Star(Piece):
         self.img = pygame.transform.scale(
             self.img, (board.tile_width + 50, board.tile_height - 20)
         )
-        self.notation = "N"
+        self.notation = "S"
 
     def get_possible_moves(self, board):
         output = []

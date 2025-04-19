@@ -28,7 +28,7 @@ class MinimaxBot:
             "S": 5, # star
             "Q": 9, # queen
             "J": 9, # joker
-            "K": 100 # king
+            "K": 10000 # king
         }
         evaluation = 0
         board_state = board.get_board_state()
@@ -46,8 +46,18 @@ class MinimaxBot:
         return evaluation
     
     def simulate_move(self, board, start_pos, end_pos):
-        new_board = copy.deepcopy(board)
-        new_board.handle_move(start_pos, end_pos)
+        # new_board = copy.deepcopy(board) # <-- REMOVE THIS LINE
+        new_board = board.copy_logical_state() # <-- ADD THIS LINE
+
+        # handle_move should ideally not fail if the move came from get_all_valid_moves,
+        # but check just in case. handle_move modifies new_board in place.
+        success = new_board.handle_move(start_pos, end_pos)
+        if not success:
+             # This scenario might indicate a bug in move generation or handle_move
+             print(f"WARNING: Simulated move failed! {start_pos} -> {end_pos} on board state:")
+             print(board.get_board_state()) # Print state *before* failed move
+             # Returning the original state copy might be safest here to avoid errors down the line
+             return board.copy_logical_state()
         return new_board
     
     def minimax(self, board, side, depth, maximizing_player):
