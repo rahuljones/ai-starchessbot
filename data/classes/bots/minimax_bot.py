@@ -128,5 +128,5 @@ class Bot:
     def move(self, side, board):
         start_time = time.time()
         best_move = self.get_best_move_minimax(board, side, self.depth)
-        print(f"Time taken: {time.time() - start_time:.4f} seconds")
+        # print(f"Time taken: {time.time() - start_time:.4f} seconds")
         return best_move

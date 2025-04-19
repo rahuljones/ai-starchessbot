@@ -30,9 +30,22 @@ if __name__ == "__main__":
     parser.add_argument("--bot2", type=str, default="IterativeBot", help="Choose bot2 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
     args = parser.parse_args()
 
+    SCORES_DICT = {
+        " ": 1,   # pawn
+        "N": 3,   # knight
+        "B": 3,   # bishop
+        "S": 6,   # star
+        "R": 8,   # rook
+        "J": 9,   # joker
+        "Q": 11,   # queen
+        "K": 1000 # king (Increased value for safety)
+    }
+
     # Dynamically load the bots based on CLI arguments
     bot1 = globals()[args.bot1]()
-    bot2 = globals()[args.bot2]()
+    # bot2 = globals()[args.bot2]()
+
+    bot2 = IterativeBot(SCORES_DICT=SCORES_DICT)
 
     running = True
 

@@ -15,7 +15,6 @@ def deepcopy_ignore_surfaces(obj, memo=None):
     if memo is None:
         memo = {}
 
-    # Check if the object is already copied
     if id(obj) in memo:
         return memo[id(obj)]
 
@@ -28,7 +27,6 @@ def deepcopy_ignore_surfaces(obj, memo=None):
         copied = {}
         memo[id(obj)] = copied
         for k, v in obj.items():
-            # Recursively copy keys and values
             copied[deepcopy_ignore_surfaces(k, memo)] = deepcopy_ignore_surfaces(v, memo)
         return copied
 
@@ -52,8 +50,6 @@ def deepcopy_ignore_surfaces(obj, memo=None):
                 setattr(copied, k, deepcopy_ignore_surfaces(v, memo))
             return copied
         except TypeError as e:
-            # Fallback for classes that might require args in __new__ or are complex
-            # print(f"Warning: Could not deepcopy object of type {type(obj)} using __new__. Error: {e}")
             return obj # Fallback: return original (use with caution)
 
     # Handle other types using standard deepcopy (like tuples, basic types)
@@ -61,11 +57,20 @@ def deepcopy_ignore_surfaces(obj, memo=None):
         try:
             return copy.deepcopy(obj, memo)
         except TypeError:
-            # Fallback for uncopyable types
             # print(f"Warning: Could not deepcopy object of type {type(obj)}. Falling back.")
             return obj # Fallback: return original (use with caution)
 # --- End Helper Function ---
 
+SCORES_DICT = {
+    " ": 1,   # pawn
+    "N": 3,   # knight
+    "B": 3,   # bishop
+    "R": 5,   # rook
+    "S": 5,   # star
+    "Q": 9,   # queen
+    "J": 9,   # joker
+    "K": 1000 # king (Increased value for safety)
+}
 
 class Bot:
     """
@@ -77,7 +82,7 @@ class Bot:
         max_threads (int): Max threads for parallelization within each depth search.
         time_limit (float): Target time limit per move in seconds.
     """
-    def __init__(self, max_depth=10, time_limit=0.095):
+    def __init__(self, max_depth=10, time_limit=0.095, SCORES_DICT=SCORES_DICT):
         """
         Initializes the bot.
 
@@ -94,18 +99,7 @@ class Bot:
         cpu_cores = os.cpu_count()
         self.max_threads = cpu_cores if cpu_cores else 4
         self.max_threads = min(self.max_threads, 8) # Cap threads
-
-        # Piece scores (kept from original)
-        self.SCORES_DICT = {
-            " ": 1,   # pawn
-            "N": 3,   # knight
-            "B": 3,   # bishop
-            "R": 5,   # rook
-            "S": 5,   # star
-            "Q": 9,   # queen
-            "J": 9,   # joker
-            "K": 1000 # king (Increased value for safety)
-        }
+        
         # Internal state for iterative deepening (optional, e.g., for move ordering)
         self.best_move_from_last_iter = None
 
@@ -358,8 +352,8 @@ class Bot:
 
         # print(f"Bot ({side}): Chose {best_move_overall}. Total Time: {self.calculation_time:.4f}s")
         if self.calculation_time > self.time_limit:
-             # print(f"Warning: Total time limit exceeded ({self.calculation_time:.4f}s > {self.time_limit}s)")
-             pass
+            print(f"Warning: Total time limit exceeded ({self.calculation_time:.4f}s > {self.time_limit}s)")
+            pass
 
         self.best_move_from_last_iter = None # Reset for next turn
         return best_move_overall

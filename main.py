@@ -22,10 +22,21 @@ def draw(display):
     pygame.display.update()
 
 
+SCORES_DICT = {
+    " ": 1,   # pawn
+    "N": 3,   # knight
+    "B": 3,   # bishop
+    "S": 6,   # star
+    "R": 8,   # rook
+    "J": 9,   # joker
+    "Q": 11,   # queen
+    "K": 1000 # king (Increased value for safety)
+}
+
 if __name__ == "__main__":
     running = True
     bot1 = IterativeBot()
-    bot2 = MinimaxBot()
+    bot2 = IterativeBot(SCORES_DICT=SCORES_DICT)
 
     while running:
         mx, my = pygame.mouse.get_pos()
