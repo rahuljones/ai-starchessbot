@@ -7,6 +7,7 @@ from data.classes.bots.minimax_bot import Bot as MinimaxBot
 from data.classes.bots.multiThreadedminimaxbot import Bot as MultiThreadedMinimaxBot
 from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 from data.classes.bots.iterative import Bot as IterativeBot
+import argparse
 
 pygame.init()
 
@@ -23,9 +24,16 @@ def draw(display):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="AI Chess Bot Versus Mode")
+    parser.add_argument("--bot1", type=str, default="IterativeBot", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
+    parser.add_argument("--bot2", type=str, default="MinimaxBot", help="Choose bot2 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
+    args = parser.parse_args()
+
+    # Dynamically load the bots based on CLI arguments
+    bot1 = globals()[args.bot1]()
+    bot2 = globals()[args.bot2]()
+
     running = True
-    bot1 = IterativeBot()
-    bot2 = MinimaxBot()
 
     while running:
         mx, my = pygame.mouse.get_pos()
@@ -45,7 +53,6 @@ if __name__ == "__main__":
         else:
             m = bot2.move("white", board)
             board.handle_move(m[0], m[1])
-
 
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")
