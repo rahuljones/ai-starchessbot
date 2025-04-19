@@ -129,7 +129,7 @@ class Board:
                     square.occupying_piece.color[0] + square.occupying_piece.notation
                 )
             else:
-                output.append("")
+                output[square.y][square.x] = ""
         return output
 
     def handle_move(self, start_pos, end_pos):
