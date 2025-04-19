@@ -66,6 +66,7 @@ class Bot:
         self.depth = depth ## Please set the depth <= 2 unless you are sure your bot runs within the time limit.
         self.time_limit = time_limit
         self.calculation_time = 0
+        self.transposition_table = {}
 
         # Determine max threads, similar to the previous version
         cpu_cores = os.cpu_count()
@@ -173,7 +174,13 @@ class Bot:
         moves = board.get_all_valid_moves(side)
         if not moves: # Handle case where no moves are possible (stalemate/checkmate)
              return self.evaluate_board(board, side)
+        board_key = self.get_board_hash(board)
 
+        # Transposition table lookup
+        if board_key in self.transposition_table:
+            cached_depth, cached_score = self.transposition_table[board_key]
+            if cached_depth >= depth:
+                return cached_score
 
         if maximizing_player:
             max_eval = float('-inf')
@@ -187,6 +194,7 @@ class Bot:
                 alpha = max(alpha, eval_score) # Update alpha
                 if beta <= alpha:
                     break # Beta cut-off
+            self.transposition_table[board_key] = (depth, max_eval)
             return max_eval
         else: # Minimizing player
             min_eval = float('inf')
@@ -200,6 +208,7 @@ class Bot:
                 beta = min(beta, eval_score) # Update beta
                 if beta <= alpha:
                     break # Alpha cut-off
+            self.transposition_table[board_key] = (depth, min_eval)
             return min_eval
 
 
@@ -273,6 +282,7 @@ class Bot:
 
     def move(self, side, board):
         """Calculates the best move using threaded Minimax+AlphaBeta."""
+        self.transposition_table.clear()
         start_time = time.time()
 
         best_move = self.get_best_move_minimax_threaded(board, side, self.depth)
@@ -292,3 +302,6 @@ class Bot:
                 return None 
 
         return best_move
+    def get_board_hash(self, board):
+        board_tuple = tuple(tuple(row) for row in board.get_board_state())
+        return (board_tuple, board.turn)

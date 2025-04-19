@@ -7,6 +7,7 @@ from data.classes.bots.minimax_bot import Bot as MinimaxBot
 from data.classes.bots.multiThreadedminimaxbot import Bot as MultiThreadedMinimaxBot
 from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 from data.classes.bots.iterative import Bot as IterativeBot
+from data.classes.bots.iterativeH import Bot as IterativeBotH
 import argparse
 
 pygame.init()
@@ -25,8 +26,8 @@ def draw(display):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AI Chess Bot Versus Mode")
-    parser.add_argument("--bot1", type=str, default="IterativeBot", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
-    parser.add_argument("--bot2", type=str, default="MinimaxBot", help="Choose bot2 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
+    parser.add_argument("--bot1", type=str, default="IterativeBotH", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
+    parser.add_argument("--bot2", type=str, default="IterativeBot", help="Choose bot2 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
     args = parser.parse_args()
 
     # Dynamically load the bots based on CLI arguments
