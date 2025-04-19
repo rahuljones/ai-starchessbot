@@ -16,7 +16,7 @@ The objective of ACM Chess is to **Capture** your opponent’s King while follow
 
 ### **Pawn**
 _Pawns move as follows:_
-- Forward movement: Can move one square forward, but cannot capture directly in front of it.
+- Forward movement: Can move one or two squares forward, but cannot capture directly in front of it.
 - Capturing: Can capture **diagonally** forward one square to the left or right.
 - Special moves: If this piece reaches the end of the board, it **promotes** into a Joker.
 
@@ -54,6 +54,6 @@ _Pawns move as follows:_
 
 ## Winning Conditions
 - **King Capture:** If a player’s King is in captured the game ends, with the last standing king winning the game.
-- **Draw conditions:** If the game does not end within 100 moves the game will be considered a draw.
+- **Draw conditions:** If the game does not end within 50 moves (each side) the game will be considered a draw.
 
 ---
