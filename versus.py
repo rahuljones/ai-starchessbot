@@ -9,6 +9,8 @@ from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 from data.classes.bots.iterative import Bot as IterativeBot
 from data.classes.bots.iterativeH import Bot as IterativeBotH
 from data.classes.bots.iterative_no_thread import Bot as IterativeNoThreadedBot
+from data.classes.bots.god1 import Bot as God1Bot
+from data.classes.bots.god2 import Bot as God2Bot
 import argparse
 
 pygame.init()
@@ -27,8 +29,8 @@ def draw(display):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="AI Chess Bot Versus Mode")
-    parser.add_argument("--bot1", type=str, default="IterativeBotH", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
-    parser.add_argument("--bot2", type=str, default="IterativeBot", help="Choose bot2 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
+    parser.add_argument("--bot1", type=str, default="RandomBot", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBotm IterativeNoThreadedBot)")
+    parser.add_argument("--bot2", type=str, default="God1Bot", help="Choose bot2 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot, IterativeNoThreadedBot)")
     args = parser.parse_args()
 
     SCORES_DICT = {
@@ -44,9 +46,7 @@ if __name__ == "__main__":
 
     # Dynamically load the bots based on CLI arguments
     bot1 = globals()[args.bot1]()
-    # bot2 = globals()[args.bot2]()
-
-    bot2 = IterativeNoThreadedBot()
+    bot2 = globals()[args.bot2]()
 
     running = True
 

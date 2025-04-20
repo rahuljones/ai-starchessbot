@@ -1,3 +1,5 @@
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 
 from data.classes.Board import Board
@@ -9,6 +11,8 @@ from data.classes.bots.montecarlo_bot import Bot as MonteCarloBot
 from data.classes.bots.iterative import Bot as IterativeBot
 from data.classes.bots.iterativeH import Bot as IterativeBotH
 from data.classes.bots.iterative_no_thread import Bot as IterativeNoThreadedBot
+from data.classes.bots.god1 import Bot as God1Bot
+from data.classes.bots.god2 import Bot as God2Bot
 
 pygame.init()
 
@@ -37,8 +41,8 @@ SCORES_DICT = {
 
 if __name__ == "__main__":
     running = True
-    bot1 = IterativeNoThreadedBot()
-    bot2 = IterativeNoThreadedBot()
+    bot1 = God2Bot()
+    bot2 = RandomBot()
 
     while running:
         mx, my = pygame.mouse.get_pos()
@@ -55,11 +59,11 @@ if __name__ == "__main__":
         if board.turn == "black":
             m = bot1.move("black", board)
             board.handle_move(m[0], m[1])
-            print("Black moved\n")
+            # print("Black moved\n")
         else:
             m = bot2.move("white", board)
             board.handle_move(m[0], m[1])
-            print("White moved\n")
+            # print("White moved\n")
 
         if board.is_in_checkmate("black"):  # If black is in checkmate
             print("White wins!")

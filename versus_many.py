@@ -30,9 +30,9 @@ def run_matches(bot1, bot2, num_matches=10):
     print(f"{bot2} Win Percentage: {bot2_win_percentage:.2f}%")
 
 if __name__ == "__main__":
-    # parser.add_argument("--bot1", type=str, default="IterativeBot", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot)")
-    BOT1 = "IterativeBot"
-    BOT2 = "IterativeBotH"
+    # parser.add_argument("--bot1", type=str, default="IterativeBot", help="Choose bot1 (e.g., RandomBot, SingleStepBot, MinimaxBot, MultiThreadedMinimaxBot, MonteCarloBot, IterativeBot, IterativeNoThreadedBot, God1Bot)")
+    BOT1 = "God2Bot"
+    BOT2 = "God1Bot"
     run_matches(BOT1, BOT2)
     print("switching...")
     run_matches(BOT2, BOT1)
